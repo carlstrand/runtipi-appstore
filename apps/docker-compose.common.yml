@@ -1,6 +1,15 @@
-version: "3.9"
-
 networks:
   tipi_main_network:
     name: runtipi_tipi_main_network
     external: true
+
+  tipi_maclvan_network:
+    name: tipi_maclvan_network
+    driver: macvlan
+    driver_opts:
+      parent: end0
+    ipam:
+      config:
+        - subnet: 192.168.50.0/24
+          ip_range: 192.168.50.225/32
+          gateway: 192.168.50.1
