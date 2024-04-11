@@ -1,5 +1,139 @@
 version: "3.9"
 
+  n8n-db:
+    container_name: n8n-db
+    image: postgres:11
+    restart: unless-stopped
+    networks:
+      - tipi_main_network
+    environment:
+      - POSTGRES_USER=tipi
+      - POSTGRES_PASSWORD=${N8N_DB_PASSWORD}
+      - POSTGRES_DB=n8n
+      - POSTGRES_NON_ROOT_USER=n8n
+      - POSTGRES_NON_ROOT_PASSWORD=${N8N_NR_DB_PASSWORD}
+    volumes:
+      - ${APP_DATA_DIR}/data/postgres:/var/lib/postgresql/data
+      - ${APP_DATA_DIR}/data/init-data.sh:/docker-entrypoint-initdb.d/init-data.sh
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -h localhost -U $$POSTGRES_USER -d $$POSTGRES_DB",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+
+  mixpost-mysql:
+    image: mysql/mysql-server:8.0
+    container_name: mixpost_mysql
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MIXPOST_MYSQL_PASSWORD}
+      - MYSQL_USER=tipi
+      - MYSQL_PASSWORD=${MIXPOST_MYSQL_PASSWORD}
+      - MYSQL_DATABASE=mixpost
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-p ${MIXPOST_MYSQL_PASSWORD}"]
+      retries: 3
+      timeout: 5s
+    volumes:
+      - ${APP_DATA_DIR}/data/mysql:/var/lib/mysql
+    networks:
+      - tipi_main_network
+
+  mixpost-redis:
+    image: "redis:latest"
+    command: redis-server --appendonly yes --replica-read-only no --requirepass "${MIXPOST_REDIS_PASSWORD}"
+    volumes:
+      - "${APP_DATA_DIR}/data/redis:/data"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      retries: 3
+      timeout: 5s
+    networks:
+      - tipi_main_network
+
+
+  librephotos-db:
+    image: postgres:14
+    container_name: librephotos-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: ${LIBREPHOTOS_DB_PASSWORD}
+      POSTGRES_USER: tipi
+      POSTGRES_DB: librephotos
+    volumes:
+      - ${APP_DATA_DIR}/data/db:/var/lib/postgresql/data
+    #Checking health of Postgres db
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - tipi_main_network
+  koillection-db:
+    image: postgres:15
+    container_name: koillection-db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=koillection
+      - POSTGRES_USER={KOILLECTION_DB_USER}
+      - POSTGRES_PASSWORD={KOILLECTION_DB_PASSWORD}
+    volumes:
+      - ${APP_DATA_DIR}/data/volumes/postgresql:/var/lib/postgresql/data
+    networks:
+      - tipi_main_network
+      
+  linkwarden-db:
+    container_name: linkwarden-db
+    image: postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=tipi
+      - POSTGRES_PASSWORD=${LINKWARDEN_DB_PASSWORD}
+      - POSTGRES_DB=linkwarden
+    volumes:
+      - ${APP_DATA_DIR}/data/postgres:/var/lib/postgresql/data
+    networks:
+      - tipi_main_network
+
+  nocodb-db:
+    container_name: nocodb-db
+    environment:
+      POSTGRES_DB: nocodb
+      POSTGRES_PASSWORD: ${NOCODB_DB_PASSWORD}
+      POSTGRES_USER: postgres
+    healthcheck:
+      interval: 10s
+      retries: 10
+      test: 'pg_isready -U "$$POSTGRES_USER" -d "$$POSTGRES_DB"'
+      timeout: 2s
+    image: postgres
+    restart: always
+    volumes:
+      - ${APP_DATA_DIR}/data/postgres:/var/lib/postgresql/data
+    networks:
+      - tipi_main_network
+
+  nocodb-redis:
+    image: redis:alpine
+    container_name: nocodb-redis
+    restart: unless-stopped
+    command: "redis-server --requirepass ${NOCODB_REDIS_PASSWORD}"
+    volumes:
+      - ${APP_DATA_DIR}/data/redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 1s
+      timeout: 3s
+      retries: 30
+    networks:
+      - tipi_main_network
+
   immich-redis:
     container_name: immich-redis
     image: redis:6.2
