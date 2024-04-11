@@ -1,0 +1,33 @@
+services:
+  technitium:
+    image: m400/technitium:latest
+    hostname: dns-server
+    # networks:  Create network and uncomment if connecting to another container (reverse proxy, etc..)
+    # - technitium-network
+    ports:
+    - 53:53/udp
+    - 53:53/tcp
+    - 67:67/udp
+    - 80:80/tcp
+    - 443:443/tcp
+    - 853:853/tcp
+    - 5380:5380/tcp
+    - 8053:8053/tcp 
+    environment:
+    - DNS_SERVER_LOG_USING_LOCAL_TIME=true
+    - DNS_SERVER_DOMAIN=dns-server
+    - TZ=America/New_York
+    volumes:
+    - data:/app/config
+    - ssl:/etc/ssl
+    - logs:/app/config/logs
+    restart: unless-stopped
+    
+volumes:
+  data:
+  ssl:
+  logs:
+  
+#networks:
+  #technitium-network:
+    #external: true
