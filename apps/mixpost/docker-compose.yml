@@ -52,32 +52,3 @@ services:
       traefik.http.routers.mixpost-local.service: mixpost
       traefik.http.routers.mixpost-local.tls: true
 
-  mixpost-mysql:
-    image: mysql/mysql-server:8.0
-    container_name: mixpost_mysql
-    restart: unless-stopped
-    environment:
-      - MYSQL_ROOT_PASSWORD=${MIXPOST_MYSQL_PASSWORD}
-      - MYSQL_USER=tipi
-      - MYSQL_PASSWORD=${MIXPOST_MYSQL_PASSWORD}
-      - MYSQL_DATABASE=mixpost
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-p ${MIXPOST_MYSQL_PASSWORD}"]
-      retries: 3
-      timeout: 5s
-    volumes:
-      - ${APP_DATA_DIR}/data/mysql:/var/lib/mysql
-    networks:
-      - tipi_main_network
-
-  mixpost-redis:
-    image: "redis:latest"
-    command: redis-server --appendonly yes --replica-read-only no --requirepass "${MIXPOST_REDIS_PASSWORD}"
-    volumes:
-      - "${APP_DATA_DIR}/data/redis:/data"
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      retries: 3
-      timeout: 5s
-    networks:
-      - tipi_main_network
