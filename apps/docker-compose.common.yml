@@ -1,5 +1,38 @@
 version: "3.9"
 
+  outline-postgres:
+    container_name: outline-postgres
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=outline
+      - POSTGRES_PASSWORD=${OUTLINE_PG_PASSWORD}
+      - POSTGRES_DB=outline
+    volumes:
+      - ${APP_DATA_DIR}/data/db:/var/lib/postgresql/data
+    networks:
+      - tipi_main_network
+
+  outline-redis:
+    container_name: outline-redis
+    image: redis:7-alpine
+    restart: unless-stopped
+    networks:
+      - tipi_main_network
+
+  speedtest-tracker-db:
+    container_name: speedtest-tracker-db
+    image: postgres:15
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=tipi
+      - POSTGRES_PASSWORD=${SPEEDTEST_TRACKER_DB_PASSWORD}
+      - POSTGRES_DB=speedtest-tracker
+    volumes:
+      - ${APP_DATA_DIR}/data/postgres:/var/lib/postgresql/data
+    networks:
+      - tipi_main_network
+      
   n8n-db:
     container_name: n8n-db
     image: postgres:11
