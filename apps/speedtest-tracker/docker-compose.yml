@@ -51,15 +51,4 @@ services:
       traefik.http.routers.speedtest-tracker-local.service: speedtest-tracker
       traefik.http.routers.speedtest-tracker-local.tls: true
 
-  speedtest-tracker-db:
-    container_name: speedtest-tracker-db
-    image: postgres:15
-    restart: unless-stopped
-    environment:
-      - POSTGRES_USER=tipi
-      - POSTGRES_PASSWORD=${SPEEDTEST_TRACKER_DB_PASSWORD}
-      - POSTGRES_DB=speedtest-tracker
-    volumes:
-      - ${APP_DATA_DIR}/data/postgres:/var/lib/postgresql/data
-    networks:
-      - tipi_main_network
+
