@@ -46,21 +46,3 @@ services:
       traefik.http.routers.viewtube-local.entrypoints: websecure
       traefik.http.routers.viewtube-local.service: viewtube
       traefik.http.routers.viewtube-local.tls: true
-  
-  viewtube-mongodb:
-    container_name: viewtube-mongodb
-    restart: unless-stopped
-    image: mongo:5
-    networks:
-      - tipi_main_network
-    volumes:
-      - ${APP_DATA_DIR}/data/db:/data/db
-  
-  viewtube-redis:
-    container_name: viewtube-redis
-    restart: unless-stopped
-    image: redis:7
-    networks:
-      - tipi_main_network
-    volumes:
-      - ${APP_DATA_DIR}/data/redis:/data
