@@ -18,8 +18,6 @@ services:
     ports:
       - ${APP_PORT}:3000
       - "222:22"
-    depends_on:
-      - gitea-db
     networks:
       - tipi_main_network
     labels:
@@ -48,15 +46,3 @@ services:
       traefik.http.routers.gitea-local.service: gitea
       traefik.http.routers.gitea-local.tls: true
 
-  gitea-db:
-    container_name: gitea-db
-    image: postgres:14
-    restart: unless-stopped
-    environment:
-      - POSTGRES_USER=gitea
-      - POSTGRES_PASSWORD=gitea
-      - POSTGRES_DB=gitea
-    volumes:
-      - ${APP_DATA_DIR}/data/postgres:/var/lib/postgresql/data
-    networks:
-      - tipi_main_network
