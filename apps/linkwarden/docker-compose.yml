@@ -14,8 +14,6 @@ services:
       - ${APP_DATA_DIR}/data/linkwarden:/data/data
     ports:
       - ${APP_PORT}:3000
-    depends_on:
-      - linkwarden-db
     networks:
       - tipi_main_network
     labels:
@@ -43,16 +41,3 @@ services:
       traefik.http.routers.linkwarden-local.entrypoints: websecure
       traefik.http.routers.linkwarden-local.service: linkwarden
       traefik.http.routers.linkwarden-local.tls: true
-
-  linkwarden-db:
-    container_name: linkwarden-db
-    image: postgres
-    restart: unless-stopped
-    environment:
-      - POSTGRES_USER=tipi
-      - POSTGRES_PASSWORD=${LINKWARDEN_DB_PASSWORD}
-      - POSTGRES_DB=linkwarden
-    volumes:
-      - ${APP_DATA_DIR}/data/postgres:/var/lib/postgresql/data
-    networks:
-      - tipi_main_network
