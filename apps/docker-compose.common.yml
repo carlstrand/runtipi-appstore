@@ -1,5 +1,14 @@
 version: "3.9"
 
+  your-spotify-db:
+    container_name: your-spotify-db
+    image: mongo:4.4.8
+    restart: unless-stopped
+    volumes:
+      - ${APP_DATA_DIR}/data/db:/data/db
+    networks:
+      - tipi_main_network
+      
   outline-postgres:
     container_name: outline-postgres
     image: postgres:16-alpine
